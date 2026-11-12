@@ -1,0 +1,23 @@
+import { chromium } from 'playwright';
+import http from 'node:http'; import fs from 'node:fs'; import path from 'node:path';
+const root='/home/ubuntu/b7-studio-cinema'; const dist=path.join(root,'dist');
+const srv=http.createServer((q,s)=>{const u=decodeURIComponent(q.url.split('?')[0]);const f=path.join(dist,u==='/'?'index.html':u);if(!fs.existsSync(f)||fs.statSync(f).isDirectory()){s.writeHead(404);return s.end();}s.writeHead(200,{'Content-Type':f.endsWith('.js')?'text/javascript':f.endsWith('.css')?'text/css':f.endsWith('.json')?'application/json':'text/html'});fs.createReadStream(f).pipe(s);}).listen(0,'127.0.0.1');
+await new Promise(r=>srv.on('listening',r));
+const port=srv.address().port;
+const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']});
+const p=await b.newPage({viewport:{width:1200,height:900}});
+await p.goto(`http://127.0.0.1:${port}/index.html`);
+await p.waitForFunction(()=>window.__B7_READY__===true,null,{timeout:120000});
+await p.waitForTimeout(1500);
+const res=await p.evaluate(()=>{
+  window.b7.renderFrame(2);
+  const gl=document.querySelector('#gl');
+  const d=gl.toDataURL('image/png');
+  return {len:d.length, style:getComputedStyle(gl).opacity+'/'+getComputedStyle(gl).filter+'/'+getComputedStyle(gl).mixBlendMode};
+});
+console.log('gl toDataURL len', res.len, 'css', res.style);
+fs.mkdirSync('/home/ubuntu/b7-studio-cinema/out/dbg',{recursive:true});
+const b64=await p.evaluate(()=>document.querySelector('#gl').toDataURL('image/png'));
+fs.writeFileSync('/home/ubuntu/b7-studio-cinema/out/dbg/canvas_direct.png', Buffer.from(b64.split(',')[1],'base64'));
+await p.screenshot({path:'/home/ubuntu/b7-studio-cinema/out/dbg/page_shot.png'});
+await b.close(); srv.close();

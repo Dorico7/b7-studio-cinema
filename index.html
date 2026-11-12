@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>B7 Studio Cinema</title>
+    <meta name="description" content="Estudio gratuito de animacoes cartoon 2D/3D para YouTube Shorts, Reels e TikTok." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2314181f'/%3E%3Ctext x='32' y='44' font-family='Arial' font-size='30' font-weight='bold' fill='%23ffd84a' text-anchor='middle'%3EB7%3C/text%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="./src/styles/app.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="topbar">
+        <div class="brand">
+          <span class="logo">B7</span>
+          <div class="brand-text">
+            <strong>Studio Cinema</strong>
+            <small>animacao cartoon para Shorts</small>
+          </div>
+        </div>
+        <input id="projectTitle" class="title-input" value="Novo projeto" aria-label="Titulo do projeto" />
+        <div class="actions">
+          <button id="btnNew" class="ghost" title="Criar projeto em branco">Novo</button>
+          <button id="btnOpen" class="ghost" title="Abrir projeto salvo (.b7zip ou .json)">Abrir</button>
+          <button id="btnSave" class="ghost" title="Salvar no navegador (IndexedDB)">Salvar</button>
+          <button id="btnProjectMenu" class="ghost" title="Presets, exportar e importar">Arquivo</button>
+          <button id="btnWebm" class="primary" title="Gravar WebM no navegador">Exportar WebM</button>
+          <button id="btnLocal" class="cta" title="Gerar pacote para MP4 1080x1920 local">Renderizar MP4</button>
+        </div>
+      </header>
+
+      <main>
+        <aside class="panel left">
+          <div class="panel-head">
+            <h2>Roteiro</h2>
+            <span id="wordCount" class="muted">0 palavras</span>
+          </div>
+          <textarea id="script" spellcheck="true" placeholder="Cole aqui o roteiro em portugues. Ex.: Em 1963, um homem quebrou uma parede do porao e encontrou uma passagem escura..."></textarea>
+          <div class="plan-row">
+            <button id="btnPlan" class="primary">Planejar cenas</button>
+            <select id="planCount" title="Numero maximo de cenas">
+              <option value="5">5 cenas</option>
+              <option value="6">6 cenas</option>
+              <option value="7">7 cenas</option>
+              <option value="8" selected>8 cenas</option>
+              <option value="10">10 cenas</option>
+            </select>
+          </div>
+          <p id="planNote" class="note"></p>
+          <div class="panel-head sub">
+            <h2>Cenas</h2>
+            <button id="btnAddScene" class="mini">+ cena</button>
+          </div>
+          <div id="sceneList" class="scene-list"></div>
+          <div class="presets">
+            <div class="panel-head sub"><h2>Modelos</h2></div>
+            <button class="model-btn" data-preset="derinkuyu">Derinkuyu (piloto 7 cenas)</button>
+            <button class="model-btn" data-preset="blank">Projeto em branco</button>
+          </div>
+        </aside>
+
+        <section class="stage-wrap">
+          <div class="stage" id="stage">
+            <canvas id="gl" width="540" height="960"></canvas>
+            <canvas id="captions" width="540" height="960"></canvas>
+            <div class="safe-frame" aria-hidden="true"></div>
+            <div id="stageError" class="stage-error" hidden></div>
+          </div>
+          <div class="transport">
+            <button id="btnStart" class="icon" title="Inicio (Home)">⏮</button>
+            <button id="btnPrevFrame" class="icon" title="Quadro anterior (←)">◀|</button>
+            <button id="btnPlay" class="play" title="Reproduzir (Espaco)">▶</button>
+            <button id="btnNextFrame" class="icon" title="Proximo quadro (→)">|▶</button>
+            <button id="btnEnd" class="icon" title="Fim (End)">⏭</button>
+            <div class="timecode"><span id="tcNow">00:00.00</span> / <span id="tcTotal">00:00.00</span></div>
+            <label class="res">
+              Previa
+              <select id="previewRes">
+                <option value="360">360×640</option>
+                <option value="540" selected>540×960</option>
+                <option value="720">720×1280</option>
+              </select>
+            </label>
+          </div>
+        </section>
+
+        <aside class="panel right" id="inspector"></aside>
+      </main>
+
+      <footer class="timeline-wrap">
+        <div class="tl-head">
+          <span>Linha do tempo</span>
+          <span class="muted" id="tlHint">clique para posicionar · arraste o cursor</span>
+        </div>
+        <canvas id="timeline" height="150"></canvas>
+      </footer>
+    </div>
+
+    <dialog id="modalLocal" class="modal">
+      <h3>Renderizar MP4 1080×1920</h3>
+      <p>O GitHub Pages e estatico: o MP4 e gerado no seu PC com Node + Playwright + FFmpeg. O site prepara o pacote do projeto.</p>
+      <ol>
+        <li>Clique em <strong>Baixar pacote (.b7zip)</strong>.</li>
+        <li>No PC, rode <code>npm install</code> e depois <code>npm run render:frames -- pacote.b7zip</code>.</li>
+        <li>Rode <code>npm run render:encode -- out/meu-video</code> para gerar o MP4 e o relatorio de QA.</li>
+      </ol>
+      <pre id="cmdPreview"></pre>
+      <div class="modal-actions">
+        <button id="btnDownloadPack" class="primary">Baixar pacote (.b7zip)</button>
+        <button id="btnCloseLocal" class="ghost">Fechar</button>
+      </div>
+    </dialog>
+
+    <dialog id="modalFile" class="modal">
+      <h3>Arquivo</h3>
+      <div class="file-grid">
+        <button id="btnExportJson" class="ghost">Exportar JSON</button>
+        <button id="btnImportJson" class="ghost">Importar JSON</button>
+        <button id="btnSaveAs" class="ghost">Salvar como novo</button>
+        <button id="btnLoadSaved" class="ghost">Abrir projeto salvo</button>
+      </div>
+      <div id="savedList" class="saved-list"></div>
+      <div class="modal-actions"><button id="btnCloseFile" class="primary">Fechar</button></div>
+    </dialog>
+
+    <input type="file" id="fileInput" accept=".json,.b7zip,application/json,application/zip" hidden />
+    <input type="file" id="audioInput" accept="audio/*" hidden />
+    <div id="toast" class="toast" hidden></div>
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>

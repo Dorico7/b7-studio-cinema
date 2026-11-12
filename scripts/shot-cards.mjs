@@ -1,0 +1,12 @@
+import { chromium } from 'playwright';
+import http from 'node:http'; import fs from 'node:fs'; import path from 'node:path';
+const root='/home/ubuntu/b7-studio-cinema';
+const srv=http.createServer((q,s)=>{const u=decodeURIComponent(q.url.split('?')[0]);const f=path.join(root,u);if(!fs.existsSync(f)){s.writeHead(404);return s.end();}s.writeHead(200,{'Content-Type':f.endsWith('.js')?'text/javascript':'text/html'});fs.createReadStream(f).pipe(s);}).listen(0,'127.0.0.1');
+await new Promise(r=>srv.on('listening',r));
+const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+const p=await b.newPage({viewport:{width:1860,height:1030}});
+p.on('pageerror',e=>console.log('ERR',e.message)); p.on('console',m=>{if(m.type()==='error')console.log('PAGE',m.text())});
+await p.goto(`http://127.0.0.1:${srv.address().port}/debug/card.html`);
+await p.waitForFunction(()=>window.__CARD_READY__===true,null,{timeout:30000});
+await p.screenshot({path:root+'/out/debug/cards.png'});
+await b.close(); srv.close();

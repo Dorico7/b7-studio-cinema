@@ -1,0 +1,45 @@
+{
+  "schema": "b7studio/project@1",
+  "title": "A ligação na piscina",
+  "script": "Eu atendi o telefone na piscina e descobri que o patinho sabia de tudo.",
+  "fps": 30,
+  "resolution": { "w": 1080, "h": 1920 },
+  "style": "cinema",
+  "captionsEnabled": true,
+  "voice": null,
+  "music": null,
+  "scenes": [
+    {
+      "id": "pool-1",
+      "set": "pool",
+      "setParams": { "bulbs": 12 },
+      "light": "pool-night",
+      "durationSec": 4.2,
+      "camera": { "type": "push-in", "intensity": 0.28 },
+      "actors": [{ "id": "pool-a1", "character": "poolhost", "expression": "stern", "L": "hang", "R": "phone", "prop": "phone", "x": -1.2, "y": 0.18, "z": 2.1, "scale": 1.25, "look": 0.2 }],
+      "caption": { "text": "EU ATENDI O TELEFONE", "y": 0.78, "style": "impact" },
+      "fx": [{ "type": "glow", "x": 0, "y": 1.3, "z": 2, "scale": 0.35, "start": 0, "duration": 4.2 }]
+    },
+    {
+      "id": "pool-2",
+      "set": "pool",
+      "setParams": { "bulbs": 12 },
+      "light": "pool-night",
+      "durationSec": 4.8,
+      "camera": { "type": "pan-right", "intensity": 0.42 },
+      "actors": [{ "id": "pool-a2", "character": "poolhost", "expression": "surprised", "L": "point", "R": "phone", "prop": "phone", "x": -0.65, "y": 0.16, "z": 2.0, "scale": 1.2, "look": -0.15 }],
+      "caption": { "text": "O PATINHO SABIA DE TUDO", "y": 0.78, "style": "impact" },
+      "fx": [{ "type": "sparkle", "x": 2.0, "y": 0.9, "z": 2.2, "scale": 0.25, "start": 0.5, "duration": 2.2 }]
+    },
+    {
+      "id": "pool-3",
+      "set": "pool",
+      "setParams": { "bulbs": 12 },
+      "light": "pool-night",
+      "durationSec": 4.4,
+      "camera": { "type": "crane-up", "intensity": 0.35 },
+      "actors": [{ "id": "pool-a3", "character": "poolhost", "expression": "smile", "L": "wave", "R": "phone", "prop": "phone", "x": -1.0, "y": 0.18, "z": 1.7, "scale": 1.18, "look": 0.1 }],
+      "caption": { "text": "E EU TIVE QUE OUVIR", "y": 0.78, "style": "warm" }
+    }
+  ]
+}

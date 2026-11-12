@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body { margin: 0; background: #dfe6ee; display: flex; gap: 10px; padding: 10px; }
+      canvas { background: #cfd8e3; border: 1px solid #8899aa; }
+    </style>
+  </head>
+  <body>
+    <canvas id="a" width="600" height="1000"></canvas>
+    <canvas id="b" width="600" height="1000"></canvas>
+    <canvas id="c" width="600" height="1000"></canvas>
+    <script type="module">
+      import { character } from '../src/engine/cast.js';
+      import { Pen } from '../src/engine/pen.js';
+      const draw = (id, outfit, opts) => {
+        const c = document.getElementById(id);
+        const g = c.getContext('2d');
+        g.clearRect(0, 0, 600, 1000);
+        const p = new Pen(g);
+        character(p, outfit, opts);
+      };
+      draw('a', 'explorer', { expr: 'neutral', seed: 3 });
+      draw('b', 'worker', { expr: 'surprised', seed: 5, R: 'hammer', prop: 'hammer' });
+      draw('c', 'elder', { expr: 'thinking', seed: 8, L: 'hold', R: 'point' });
+      window.__CARD_READY__ = true;
+    </script>
+  </body>
+</html>
